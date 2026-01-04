@@ -31,7 +31,7 @@ local gui = Instance.new("ScreenGui", lp.PlayerGui)
 gui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,160,0,290)
+frame.Size = UDim2.new(0,160,0,240)
 frame.Position = UDim2.new(0,8,0,170)
 frame.BackgroundColor3 = Color3.fromRGB(18,18,18)
 frame.Active = true
@@ -259,7 +259,7 @@ minBtn.MouseButton1Click:Connect(function()
 			v.Visible = not minimized
 		end
 	end
-	frame.Size = minimized and UDim2.new(0,160,0,24) or UDim2.new(0,160,0,290)
+	frame.Size = minimized and UDim2.new(0,160,0,24) or UDim2.new(0,160,0,240)
 end)
 
 -- FECHAR

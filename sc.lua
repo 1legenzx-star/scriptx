@@ -1,4 +1,4 @@
--- HUB MOVEMENT + AUTOCLICK (FLOAT + FLY + NOCLIP + AUTOCLICK + MINIMIZAR)
+-- HUB MOVEMENT + AUTOCLICK + ESP FRIENDS
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -15,7 +15,7 @@ local floating, infJump, noclip, autoclick, speedOn = false,false,false,false,fa
 -- FLY
 local flying = false
 local flyBV, flyBG, flyConn
-local flySpeed = 20 -- VELOCIDADE DO FLY
+local flySpeed = 40
 
 -- AUTOCLICK
 local clickRunning = false
@@ -31,7 +31,7 @@ local gui = Instance.new("ScreenGui", lp.PlayerGui)
 gui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,160,0,230)
+frame.Size = UDim2.new(0,160,0,290)
 frame.Position = UDim2.new(0,8,0,170)
 frame.BackgroundColor3 = Color3.fromRGB(18,18,18)
 frame.Active = true
@@ -72,6 +72,7 @@ local speedBtn = mkBtn("SPEED: OFF", 90)
 local noclipBtn= mkBtn("NOCLIP: OFF", 120)
 local flyBtn   = mkBtn("FLY: OFF", 150)
 local autoBtn  = mkBtn("AUTOCLICK: OFF", 180)
+local espBtn   = mkBtn("ESP BIBI: OFF", 210)
 
 -- FLOAT
 local floatBV
@@ -81,7 +82,6 @@ local function startFloat()
 	floatBV.Velocity = Vector3.zero
 	floatBV.Parent = hrp
 end
-
 local function stopFloat()
 	if floatBV then floatBV:Destroy() floatBV = nil end
 end
@@ -121,7 +121,6 @@ local function startNoclip()
 		end
 	end)
 end
-
 local function stopNoclip()
 	if noclipConn then noclipConn:Disconnect() noclipConn = nil end
 end
@@ -160,7 +159,7 @@ autoBtn.MouseButton1Click:Connect(function()
 	if autoclick then clickLoop() end
 end)
 
--- FLY (WASD + CAMERA)
+-- FLY
 local keys = {W=false,A=false,S=false,D=false}
 
 UIS.InputBegan:Connect(function(i,gp)
@@ -198,19 +197,57 @@ local function startFly()
 
 	flyConn = RunService.RenderStepped:Connect(function()
 		flyBG.CFrame = cam.CFrame
-
 		local dir = Vector3.zero
 		if keys.S then dir -= cam.CFrame.LookVector end
 		if keys.W then dir += cam.CFrame.LookVector end
 		if keys.A then dir -= cam.CFrame.RightVector end
 		if keys.D then dir += cam.CFrame.RightVector end
-
 		flyBV.Velocity = dir.Magnitude > 0 and dir.Unit * flySpeed or Vector3.zero
 	end)
 end
 
 flyBtn.MouseButton1Click:Connect(function()
 	if flying then stopFly() else startFly() end
+end)
+
+-- ESP FRIENDS
+local espOn = false
+local espHighlights = {}
+
+local function clearESP()
+	for _,h in pairs(espHighlights) do
+		if h then h:Destroy() end
+	end
+	espHighlights = {}
+end
+
+local function applyESP()
+	for _,plr in pairs(Players:GetPlayers()) do
+		if plr ~= lp and lp:IsFriendsWith(plr.UserId) then
+			if plr.Character then
+				local h = Instance.new("Highlight")
+				h.FillColor = Color3.fromRGB(0,120,255)
+				h.OutlineColor = Color3.new(1,1,1)
+				h.Adornee = plr.Character
+				h.Parent = plr.Character
+				table.insert(espHighlights, h)
+			end
+		end
+	end
+end
+
+espBtn.MouseButton1Click:Connect(function()
+	espOn = not espOn
+	espBtn.Text = espOn and "ESP BIBI: ON" or "ESP BIBI: OFF"
+	espBtn.BackgroundColor3 = espOn and ON or OFF
+	if espOn then applyESP() else clearESP() end
+end)
+
+RunService.Stepped:Connect(function()
+	if espOn then
+		clearESP()
+		applyESP()
+	end
 end)
 
 -- MINIMIZAR
